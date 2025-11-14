@@ -25,7 +25,7 @@ namespace E_Commerce_Web
             });
             builder.Services.AddScoped<IDbInititializer, DbInititializer>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddAutoMapper(x => x.AddProfile(new ProductProfile()));
+            builder.Services.AddAutoMapper(x => x.AddProfile(new ProductProfile(builder.Configuration)));
             builder.Services.AddScoped<IProductServiece, ProductServiece>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
