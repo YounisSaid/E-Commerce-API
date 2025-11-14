@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using E_commerce.Domain.Contracts;
 using E_commerce.Domain.Entites.Products;
+using E_Commerce.Service.Specifications;
 using E_Commerce.Serviece.Abstraction;
 using E_Commerce.Shared.Dtos.Products;
 using System;
@@ -21,13 +22,15 @@ namespace E_Commerce.Service.Servieces
 
         public async Task<ProductDto> GetProductByIdAsync(int id)
         {
-            var product = await unitOfWork.GetRepository<Product, int>().GetByIdAsync(id);
+            var specfs = new ProductWithBrandTypeSpecification(id);
+            var product = await unitOfWork.GetRepository<Product, int>().GetAsync(specfs);
             return mapper.Map<ProductDto>(product);
         }
 
-        public async Task<IEnumerable<ProductDto>> GetProductsAsync(int id)
+        public async Task<IEnumerable<ProductDto>> GetProductsAsync(ProductQueryParameters parameters)
         {
-            var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync();
+            var specfs = new ProductWithBrandTypeSpecification(parameters);
+            var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(specfs);
             return mapper.Map<IEnumerable<ProductDto>>(products);
         }
 

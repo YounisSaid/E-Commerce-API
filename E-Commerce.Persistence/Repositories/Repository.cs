@@ -11,25 +11,32 @@ using System.Threading.Tasks;
 namespace E_Commerce.Persistence.Repositories
 {
     public class Repository<TEntity, TKey>(StoreDbContext context) : IRepository<TEntity, TKey> where TEntity : Entity<TKey>
-    {
+    { 
+        private readonly DbSet<TEntity> _dbset = context.Set<TEntity>();
         public void Add(TEntity entity)
             => context.Add(entity);
 
 
         public async Task<IEnumerable<TEntity>> GetAllAsync()
-            =>await context.Set<TEntity>().ToListAsync();
+            =>await _dbset.ToListAsync();
+
+        public async Task<IEnumerable<TEntity>> GetAllAsync(ISpecification<TEntity> specification)
+          => await _dbset.ApplySpeceification(specification).ToListAsync();
+
+        public async Task<TEntity>? GetAsync(ISpecification<TEntity> specification)
+          => await _dbset.ApplySpeceification(specification).FirstOrDefaultAsync();
 
 
         public async Task<TEntity>? GetByIdAsync(TKey id)
-            => await context.Set<TEntity>().FindAsync(id);
+            => await _dbset.FindAsync(id);
         
 
         public void Remove(TEntity entity)
-            => context.Remove(entity);
+            => _dbset.Remove(entity);
         
 
         public void Update(TEntity entity)
-            => context.Update(entity);
+            => _dbset.Update(entity);
         
     }
 }
