@@ -19,6 +19,15 @@ namespace E_Commerce.Persistence.Repositories
                 query = query.Where(specifications.Criteria);
 
             query = specifications.Includes.Aggregate(query, (query, specification) => query.Include(specification));
+
+            if(specifications.OrderBy is not null)
+                query = query.OrderBy(specifications.OrderBy);
+
+            if(specifications.OrderByDescending is not null)
+                query = query.OrderByDescending(specifications.OrderByDescending);
+
+            if(specifications.IsPagingEnabled)
+                query = query.Skip(specifications.Skip).Take(specifications.Take);
             return query;
         }
     }

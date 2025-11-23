@@ -20,7 +20,28 @@ namespace E_Commerce.Service.Specifications
 
         public ICollection<Expression<Func<TEntity, object>>> Includes { get; private set; } = [];
 
+        public Expression<Func<TEntity, object>>? OrderBy { get; private set; }
+
+        public Expression<Func<TEntity, object>>? OrderByDescending { get; private set; }
+
+        public int Take { get; private set; }
+
+        public int Skip { get; private set; }
+
+        public bool IsPagingEnabled { get; private set; }
+
         protected void AddInclude(Expression<Func<TEntity, object>> expression)
             => Includes.Add(expression);
+        protected void AddOrderBy(Expression<Func<TEntity, object>> expression)
+            => OrderBy = expression;
+        protected void AddOrderByDescending(Expression<Func<TEntity, object>> expression)
+            => OrderByDescending = expression;
+
+        protected void AddPaging(int pageSize, int pageIndex)
+        {
+            IsPagingEnabled = true;
+            Take = pageSize;
+            Skip = pageSize * (pageIndex - 1);
+        }
     }
 }
