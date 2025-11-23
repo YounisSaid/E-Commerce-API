@@ -3,12 +3,8 @@ using E_commerce.Domain.Contracts;
 using E_commerce.Domain.Entites.Products;
 using E_Commerce.Service.Specifications;
 using E_Commerce.Serviece.Abstraction;
+using E_Commerce.Shared;
 using E_Commerce.Shared.Dtos.Products;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace E_Commerce.Service.Servieces
 {
@@ -27,11 +23,15 @@ namespace E_Commerce.Service.Servieces
             return mapper.Map<ProductDto>(product);
         }
 
-        public async Task<IEnumerable<ProductDto>> GetProductsAsync(ProductQueryParameters parameters)
+        public async Task<PaginatedResult<ProductDto>> GetProductsAsync(ProductQueryParameters parameters)
         {
             var specfs = new ProductWithBrandTypeSpecification(parameters);
             var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(specfs);
-            return mapper.Map<IEnumerable<ProductDto>>(products);
+            var result = mapper.Map<IEnumerable<ProductDto>>(products);
+            
+            var specCount = new ProductCountSpecification(parameters);
+            int count = await unitOfWork.GetRepository<Product, int>().CountAsync(specCount);
+            return new PaginatedResult<ProductDto>( parameters.PageIndex, parameters.PageSize, count, result);
         }
 
         public async Task<IEnumerable<TypeDto>> GetTypesAsync(int id)
