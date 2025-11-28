@@ -2,7 +2,7 @@
   <Folder Name="/Core/">
     <Project Path="E-commerce.Domain/E-commerce.Domain.csproj" />
     <Project Path="E-Commerce.Service/E-Commerce.Service.csproj" />
-    <Project Path="E-Commerce.Serviece.Abstraction/E-Commerce.Serviece.Abstraction.csproj" Id="daf4232b-723f-4b14-ac21-9b38dd62d9c8" />
+    <Project Path="E-Commerce.Serviece.Abstraction/E-Commerce.Service.Abstraction.csproj" Id="daf4232b-723f-4b14-ac21-9b38dd62d9c8" />
   </Folder>
   <Folder Name="/infrastructure/">
     <Project Path="E-Commerce.Persistence/E-Commerce.Persistence.csproj" />

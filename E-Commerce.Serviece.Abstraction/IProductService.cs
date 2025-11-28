@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace E_Commerce.Serviece.Abstraction
+namespace E_Commerce.Service.Abstraction
 {
-    public interface IProductServiece
+    public interface IProductService
     {
         Task <ProductDto> GetProductByIdAsync (int id);
         Task<PaginatedResult<ProductDto>> GetProductsAsync(ProductQueryParameters parameters);

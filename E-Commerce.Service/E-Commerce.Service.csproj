@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\E-commerce.Domain\E-commerce.Domain.csproj" />
-    <ProjectReference Include="..\E-Commerce.Serviece.Abstraction\E-Commerce.Serviece.Abstraction.csproj" />
+    <ProjectReference Include="..\E-Commerce.Serviece.Abstraction\E-Commerce.Service.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>
