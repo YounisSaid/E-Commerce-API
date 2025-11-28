@@ -1,14 +1,16 @@
 ﻿using AutoMapper;
 using E_commerce.Domain.Contracts;
 using E_commerce.Domain.Entites.Products;
+using E_commerce.Domain.Exceptions.NotFound;
+using E_Commerce.Service.Abstraction;
+using E_Commerce.Service.ApplicationServiceRegistration;
 using E_Commerce.Service.Specifications;
-using E_Commerce.Serviece.Abstraction;
 using E_Commerce.Shared;
 using E_Commerce.Shared.Dtos.Products;
 
-namespace E_Commerce.Service.Servieces
+namespace E_Commerce.Service.Services
 {
-    public class ProductServiece(IUnitOfWork unitOfWork,IMapper mapper) : IProductServiece
+    public class ProductService(IUnitOfWork unitOfWork,IMapper mapper) : IProductService
     {
         public async Task<IEnumerable<BrandDto>> GetBrandsAsync(int id)
         {
@@ -20,6 +22,7 @@ namespace E_Commerce.Service.Servieces
         {
             var specfs = new ProductWithBrandTypeSpecification(id);
             var product = await unitOfWork.GetRepository<Product, int>().GetAsync(specfs);
+            if(product == null) throw new ProductNotFoundException(id);
             return mapper.Map<ProductDto>(product);
         }
 
