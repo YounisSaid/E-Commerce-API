@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace E_commerce.Domain.Contracts
 {
-    public interface IDbInititializer
+    public interface IDbInitializer
     {
-       Task Inititialize();
+        Task InitializeAsync();
+        Task InitializeIdentityAsync();
+
     }
 }

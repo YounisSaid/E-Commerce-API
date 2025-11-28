@@ -1,6 +1,9 @@
 ﻿using E_commerce.Domain.Contracts;
+using E_commerce.Domain.Entites.Identity;
 using E_commerce.Domain.Entites.Products;
 using E_Commerce.Persistence.Context;
+using E_Commerce.Persistence.Identity.Context;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,11 +14,15 @@ using System.Threading.Tasks;
 
 namespace E_Commerce.Persistence.DbInitializers
 {
-    public class DbInititializer(StoreDbContext context) : IDbInititializer
+    public class DbInitializer(StoreDbContext context,
+                               IdentityStoreDbContext identityContext,
+                               UserManager<AppUser> userManager,
+                               RoleManager<IdentityRole> roleManager) : IDbInitializer
     {
-        public async Task Inititialize()
+        public async Task InitializeAsync()
         {
-            await context.Database.MigrateAsync();
+            if (context.Database.GetPendingMigrationsAsync().GetAwaiter().GetResult().Any())
+                await context.Database.MigrateAsync();
 
             if(!context.productBrands.Any())
             {
@@ -70,6 +77,54 @@ namespace E_Commerce.Persistence.DbInitializers
                 }
 
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task InitializeIdentityAsync()
+        {
+            //Create the migrations if they are not applied
+            if (identityContext.Database.GetPendingMigrationsAsync().GetAwaiter().GetResult().Any())
+            {
+               await identityContext.Database.MigrateAsync();
+            }
+
+            //Seed Default Roles and Admin User
+            if(!identityContext.Roles.Any())
+            {
+                var roles = new List<IdentityRole>
+                {
+                    new IdentityRole("SuperAdmin"),
+                    new IdentityRole("Admin")
+                };
+              
+                await roleManager.CreateAsync(roles[0]);
+                await roleManager.CreateAsync(roles[1]);
+            }
+
+            if(!identityContext.Users.Any())
+            {
+                var superAdmin = new AppUser
+                {
+                    UserName = "SuperAdmin",
+                    Email = "superadmin@gmail.com",
+                    DisplayName = "SuperAdmin",
+                    PhoneNumber = "01234567890",
+
+                };
+                var admin = new AppUser
+                {
+                    UserName = "Admin",
+                    Email = "admin@gmail.com",
+                    DisplayName = "Admin",
+                    PhoneNumber = "01234567890",
+
+                };
+
+                await userManager.CreateAsync(superAdmin, "P@ssw0rd");
+                await userManager.CreateAsync(admin, "P@ssw0rd");
+
+                await userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
+                await userManager.AddToRoleAsync(admin, "Admin");
             }
         }
     }

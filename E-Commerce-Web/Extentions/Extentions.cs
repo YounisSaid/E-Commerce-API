@@ -80,8 +80,9 @@ namespace E_Commerce_Web.Extentions
         private static async Task<WebApplication> SeedData(this WebApplication app)
         {
             var scope = app.Services.CreateScope();
-            var initializer = scope.ServiceProvider.GetRequiredService<IDbInititializer>();
-            await initializer.Inititialize();
+            var initializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+            await initializer.InitializeAsync();
+            await initializer.InitializeIdentityAsync();
             return app;
         }
         private static WebApplication UseGlobalErrorHandler(this WebApplication app)
