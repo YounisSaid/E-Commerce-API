@@ -7,9 +7,11 @@ using E_Commerce.Service.ApplicationServiceRegistration;
 using E_Commerce.Service.Specifications;
 using E_Commerce.Shared;
 using E_Commerce.Shared.Dtos.Products;
+using Microsoft.AspNetCore.Authorization;
 
 namespace E_Commerce.Service.Services
 {
+    
     public class ProductService(IUnitOfWork unitOfWork,IMapper mapper) : IProductService
     {
         public async Task<IEnumerable<BrandDto>> GetBrandsAsync(int id)

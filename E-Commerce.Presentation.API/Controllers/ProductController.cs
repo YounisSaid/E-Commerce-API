@@ -2,11 +2,13 @@
 using E_Commerce.Service.Abstraction;
 using E_Commerce.Shared.Dtos.Products;
 using E_Commerce.Shared.ErrorModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce.Presentation.API.Controllers
 {
+    [Authorize]
     public class ProductController(IServiceManager manger) : APIBaseController
     {
         [HttpGet]
