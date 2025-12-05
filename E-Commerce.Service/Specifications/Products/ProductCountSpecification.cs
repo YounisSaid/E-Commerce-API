@@ -2,7 +2,7 @@
 using E_Commerce.Shared.Dtos.Products;
 using System.Linq.Expressions;
 
-namespace E_Commerce.Service.Specifications
+namespace E_Commerce.Service.Specifications.Products
 {
     public class ProductCountSpecification : BaseSpecificiation<Product>
     {

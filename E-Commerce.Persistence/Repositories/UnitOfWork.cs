@@ -26,8 +26,8 @@ namespace E_Commerce.Persistence.Repositories
 
         }
 
-        public Task<int> SaveChangesAsync()
-            => context.SaveChangesAsync();
+        public async Task<int> SaveChangesAsync()
+            => await context.SaveChangesAsync();
 
 
     }

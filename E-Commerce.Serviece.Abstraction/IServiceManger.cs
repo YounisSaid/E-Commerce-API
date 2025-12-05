@@ -9,5 +9,6 @@ namespace E_Commerce.Service.Abstraction
         public IBasketService BasketService { get; }
         public ICacheService CacheService { get; }
         public IAuthService AuthService { get; }
+        public IOrderService OrderService { get; }
     }
 }
