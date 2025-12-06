@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace E_Commerce.Service.Specifications
+namespace E_Commerce.Service.Specifications.Products
 {
     public class ProductWithBrandTypeSpecification : BaseSpecificiation<Product>
     {

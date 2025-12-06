@@ -15,6 +15,7 @@ namespace E_Commerce.Service.ApplicationServiceRegistration
             // Add AutoMapper profiles
             services.AddAutoMapper(x => x.AddProfile(new ProductProfile(configuration)));
             services.AddAutoMapper(x => x.AddProfile(new BasketProfile()));
+            services.AddAutoMapper(x => x.AddProfile(new OrderProfile()));
             // Register service implementations
             //services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IServiceManager, ServiceManger>();

@@ -1,4 +1,5 @@
-﻿using E_commerce.Domain.Entites.Products;
+﻿using E_commerce.Domain.Entites.Orders;
+using E_commerce.Domain.Entites.Products;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,10 @@ namespace E_Commerce.Persistence.Context
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductBrand > productBrands { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<DeliveryMethod> DeliveryMethods { get; set; }
         
     }
 }

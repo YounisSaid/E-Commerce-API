@@ -1,5 +1,6 @@
 ﻿using E_commerce.Domain.Contracts;
 using E_commerce.Domain.Entites.Identity;
+using E_commerce.Domain.Entites.Orders;
 using E_commerce.Domain.Entites.Products;
 using E_Commerce.Persistence.Context;
 using E_Commerce.Persistence.Identity.Context;
@@ -24,7 +25,26 @@ namespace E_Commerce.Persistence.DbInitializers
             if (context.Database.GetPendingMigrationsAsync().GetAwaiter().GetResult().Any())
                 await context.Database.MigrateAsync();
 
-            if(!context.productBrands.Any())
+            if (!context.DeliveryMethods.Any())
+            {
+                var deliveryData = await File.ReadAllTextAsync(@"..\E-Commerce.Persistence\Context\DataSeed\delivery.json");
+
+                var opt = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                };
+
+                var delivery = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryData, opt);
+
+                if (delivery.Any() && delivery is not null)
+                {
+                    context.AddRange(delivery);
+                }
+
+                
+            }
+
+            if (!context.productBrands.Any())
             {
                var brandsData =await File.ReadAllTextAsync(@"..\E-Commerce.Persistence\Context\DataSeed\brands.json");
 
@@ -40,7 +60,6 @@ namespace E_Commerce.Persistence.DbInitializers
                     context.AddRange(brands);
                 }
 
-                await context.SaveChangesAsync();             
             }
             if(!context.ProductTypes.Any())
             {
@@ -58,7 +77,6 @@ namespace E_Commerce.Persistence.DbInitializers
                     context.AddRange(types);
                 }
 
-                await context.SaveChangesAsync();
             }
             if (!context.Products.Any())
             {
@@ -76,8 +94,10 @@ namespace E_Commerce.Persistence.DbInitializers
                     context.AddRange(products);
                 }
 
-                await context.SaveChangesAsync();
             }
+
+            await context.SaveChangesAsync();
+
         }
 
         public async Task InitializeIdentityAsync()

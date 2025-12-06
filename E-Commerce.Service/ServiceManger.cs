@@ -8,6 +8,7 @@ using E_Commerce.Service.Auth;
 //using E_Commerce.Service.Abstraction;
 using E_Commerce.Service.Baskets;
 using E_Commerce.Service.Cache;
+using E_Commerce.Service.Orders;
 using E_Commerce.Service.Services;
 using E_Commerce.Serviece.Abstraction;
 using E_Commerce.Serviece.Abstraction.Auth;
@@ -32,5 +33,7 @@ namespace E_Commerce.Service
         public ICacheService CacheService { get; } = new CacheService(cacheRepository);
 
         public IAuthService AuthService { get; } = new AuthService(userManager, options);
+
+        public IOrderService OrderService { get; } = new OrderService(unitOfWork,mapper, basketRepository);
     }
 }
