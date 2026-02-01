@@ -12,7 +12,7 @@ namespace E_Commerce.Service.Abstraction
     {
         Task <ProductDto> GetProductByIdAsync (int id);
         Task<PaginatedResult<ProductDto>> GetProductsAsync(ProductQueryParameters parameters);
-        Task<IEnumerable<TypeDto>> GetTypesAsync(int id);
-        Task<IEnumerable<BrandDto>> GetBrandsAsync(int id);
+        Task<IEnumerable<TypeDto>> GetTypesAsync();
+        Task<IEnumerable<BrandDto>> GetBrandsAsync();
     }
 }

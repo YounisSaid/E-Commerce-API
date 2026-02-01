@@ -16,7 +16,7 @@ namespace E_Commerce.Presentation.API.Controllers
     {
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<UserResponseDto>> CreateOrderAsync(OrderRequestDto input)
+        public async Task<ActionResult<OrderResponseDto>> CreateOrder(OrderRequestDto input)
         {
             var email = User.FindFirst(ClaimTypes.Email);
             var result = await manger.OrderService.CreateOrderAsync(input, email.Value);
@@ -24,22 +24,22 @@ namespace E_Commerce.Presentation.API.Controllers
             return Ok(result);
         }
         [HttpGet("DeliveryMethods")]
-        public async Task<ActionResult<IEnumerable<DeliveryMethodResponseDto>>> GetAllDeliveryMethodsAsync()
+        public async Task<ActionResult<IEnumerable<DeliveryMethodResponseDto>>> GetAllDeliveryMethods()
         {
             var result = await manger.OrderService.GetAllDeliveryMethodsAsync();
             return Ok(result);
         }
         [HttpGet("UserOrders")]
-        public async Task<ActionResult<IEnumerable<OrderResponseDto>>> GetAllOrdersForUserAsync()
+        public async Task<ActionResult<IEnumerable<OrderResponseDto>>> GetAllUserOrders()
         {
             var email = User.FindFirst(ClaimTypes.Email);
 
             var result = await manger.OrderService.GetAllOrdersForSpecificUserAsync(email.Value);
             return Ok(result);
         }
-        [HttpGet("GetUserOrderById")]
+        [HttpGet("{id}")]
         [Authorize]
-        public async Task<ActionResult<OrderResponseDto>> GetOrderForSpecificUserByIdAsync(Guid Id)
+        public async Task<ActionResult<OrderResponseDto>> GetOrderById(Guid Id)
         {
             var email = User.FindFirst(ClaimTypes.Email);
             var result = await manger.OrderService.GetOrderForSpecificUserByIdAsync(Id,email.Value);

@@ -12,42 +12,60 @@ namespace E_Commerce.Service.ApplicationServiceRegistration
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // Add AutoMapper profiles
-            services.AddAutoMapper(x => x.AddProfile(new ProductProfile(configuration)));
-            services.AddAutoMapper(x => x.AddProfile(new BasketProfile()));
-            services.AddAutoMapper(x => x.AddProfile(new OrderProfile()));
-            // Register service implementations
-            //services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IServiceManager, ServiceManger>();
+            services.AddMappingProfiles(configuration);
+            services.AddCoreServices();
+            services.AddJwtAuthentication(configuration);
 
-            services.AddAuthenticationService(configuration);
             return services;
         }
 
-        private static IServiceCollection AddAuthenticationService(this IServiceCollection services, IConfiguration configuration)
+        private static void AddMappingProfiles(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<JwtOptions>(configuration.GetSection("jwtOptions"));
-
-            var jwtOptions = configuration.GetSection("jwtOptions").Get<JwtOptions>();
-            services.AddAuthentication(opt =>
+            services.AddAutoMapper(cfg =>
             {
-                opt.DefaultAuthenticateScheme = "Bearer";
-                opt.DefaultChallengeScheme = "Bearer";
-            }).AddJwtBearer(opt =>
-            {
-                opt.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateAudience = true,
-                    ValidAudience = jwtOptions.Audience,
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtOptions.Issuer,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecurityKey))
-
-                };
+                cfg.AddProfile(new ProductProfile(configuration));
+                cfg.AddProfile(new BasketProfile());
+                cfg.AddProfile(new OrderProfile());
+                cfg.AddProfile(new AuthProfile());
             });
-            return services;
+        }
+
+        private static void AddCoreServices(this IServiceCollection services)
+        {
+            services.AddScoped<IServiceManager, ServiceManger>();
+        }
+
+        private static void AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtSection = configuration.GetSection("jwtOptions");
+            services.Configure<JwtOptions>(jwtSection);
+
+            var jwtOptions = jwtSection.Get<JwtOptions>();
+            if (jwtOptions == null) return;
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "Bearer";
+                options.DefaultChallengeScheme = "Bearer";
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = CreateTokenValidationParameters(jwtOptions);
+            });
+        }
+
+        private static TokenValidationParameters CreateTokenValidationParameters(JwtOptions jwtOptions)
+        {
+            return new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidAudience = jwtOptions.Audience,
+                ValidateIssuer = true,
+                ValidIssuer = jwtOptions.Issuer,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecurityKey))
+            };
         }
     }
 }

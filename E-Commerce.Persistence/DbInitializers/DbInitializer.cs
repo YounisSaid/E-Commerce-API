@@ -6,145 +6,98 @@ using E_Commerce.Persistence.Context;
 using E_Commerce.Persistence.Identity.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace E_Commerce.Persistence.DbInitializers
 {
-    public class DbInitializer(StoreDbContext context,
-                               IdentityStoreDbContext identityContext,
-                               UserManager<AppUser> userManager,
-                               RoleManager<IdentityRole> roleManager) : IDbInitializer
+    public class DbInitializer(
+        StoreDbContext context,
+        IdentityStoreDbContext identityContext,
+        UserManager<AppUser> userManager,
+        RoleManager<IdentityRole> roleManager) : IDbInitializer
     {
+        private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+
         public async Task InitializeAsync()
         {
-            if (context.Database.GetPendingMigrationsAsync().GetAwaiter().GetResult().Any())
-                await context.Database.MigrateAsync();
+            await ApplyPendingMigrationsAsync(context);
 
-            if (!context.DeliveryMethods.Any())
-            {
-                var deliveryData = await File.ReadAllTextAsync(@"..\E-Commerce.Persistence\Context\DataSeed\delivery.json");
-
-                var opt = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                };
-
-                var delivery = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryData, opt);
-
-                if (delivery.Any() && delivery is not null)
-                {
-                    context.AddRange(delivery);
-                }
-
-                
-            }
-
-            if (!context.productBrands.Any())
-            {
-               var brandsData =await File.ReadAllTextAsync(@"..\E-Commerce.Persistence\Context\DataSeed\brands.json");
-
-                var opt = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                };
-
-                var brands = JsonSerializer.Deserialize<List<ProductBrand>>(brandsData,opt);
-
-                if(brands.Any()&&brands is not null )
-                {
-                    context.AddRange(brands);
-                }
-
-            }
-            if(!context.ProductTypes.Any())
-            {
-                var typesData = await File.ReadAllTextAsync(@"..\E-Commerce.Persistence\Context\DataSeed\types.json");
-
-                var opt = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                };
-
-                var types = JsonSerializer.Deserialize<List<ProductType>>(typesData, opt);
-
-                if (types.Any() && types is not null)
-                {
-                    context.AddRange(types);
-                }
-
-            }
-            if (!context.Products.Any())
-            {
-                var productsData = await File.ReadAllTextAsync(@"..\E-Commerce.Persistence\Context\DataSeed\products.json");
-
-                var opt = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                };
-
-                var products = JsonSerializer.Deserialize<List<Product>>(productsData, opt);
-
-                if (products.Any() && products is not null)
-                {
-                    context.AddRange(products);
-                }
-
-            }
+            await SeedDataAsync<DeliveryMethod>(context.DeliveryMethods, "delivery.json");
+            await SeedDataAsync<ProductBrand>(context.productBrands, "brands.json");
+            await SeedDataAsync<ProductType>(context.ProductTypes, "types.json");
+            await SeedDataAsync<Product>(context.Products, "products.json");
 
             await context.SaveChangesAsync();
-
         }
 
         public async Task InitializeIdentityAsync()
         {
-            //Create the migrations if they are not applied
-            if (identityContext.Database.GetPendingMigrationsAsync().GetAwaiter().GetResult().Any())
+            await ApplyPendingMigrationsAsync(identityContext);
+            await SeedRolesAsync();
+            await SeedAdminUsersAsync();
+        }
+
+        private static async Task ApplyPendingMigrationsAsync(DbContext dbContext)
+        {
+            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
             {
-               await identityContext.Database.MigrateAsync();
+                await dbContext.Database.MigrateAsync();
             }
+        }
 
-            //Seed Default Roles and Admin User
-            if(!identityContext.Roles.Any())
+        private async Task SeedDataAsync<T>(DbSet<T> dbSet, string fileName) where T : class
+        {
+            if (await dbSet.AnyAsync()) return;
+
+            var path = Path.Combine("..", "E-Commerce.Persistence", "Context", "DataSeed", fileName);
+            if (!File.Exists(path)) return;
+
+            var jsonData = await File.ReadAllTextAsync(path);
+            var entities = JsonSerializer.Deserialize<List<T>>(jsonData, _jsonOptions);
+
+            if (entities?.Any() == true)
             {
-                var roles = new List<IdentityRole>
-                {
-                    new IdentityRole("SuperAdmin"),
-                    new IdentityRole("Admin")
-                };
-              
-                await roleManager.CreateAsync(roles[0]);
-                await roleManager.CreateAsync(roles[1]);
+                await dbSet.AddRangeAsync(entities);
             }
+        }
 
-            if(!identityContext.Users.Any())
+        private async Task SeedRolesAsync()
+        {
+            if (await roleManager.Roles.AnyAsync()) return;
+
+            await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
+            await roleManager.CreateAsync(new IdentityRole("Admin"));
+        }
+
+        private async Task SeedAdminUsersAsync()
+        {
+            if (await userManager.Users.AnyAsync()) return;
+
+            var superAdmin = CreateAppUser("SuperAdmin", "superadmin@gmail.com");
+            var admin = CreateAppUser("Admin", "admin@gmail.com");
+
+            await CreateUserWithRoleAsync(superAdmin, "P@ssw0rd", "SuperAdmin");
+            await CreateUserWithRoleAsync(admin, "P@ssw0rd", "Admin");
+        }
+
+        private static AppUser CreateAppUser(string name, string email)
+        {
+            return new AppUser
             {
-                var superAdmin = new AppUser
-                {
-                    UserName = "SuperAdmin",
-                    Email = "superadmin@gmail.com",
-                    DisplayName = "SuperAdmin",
-                    PhoneNumber = "01234567890",
+                UserName = name,
+                Email = email,
+                DisplayName = name,
+                PhoneNumber = "01234567890"
+            };
+        }
 
-                };
-                var admin = new AppUser
-                {
-                    UserName = "Admin",
-                    Email = "admin@gmail.com",
-                    DisplayName = "Admin",
-                    PhoneNumber = "01234567890",
-
-                };
-
-                await userManager.CreateAsync(superAdmin, "P@ssw0rd");
-                await userManager.CreateAsync(admin, "P@ssw0rd");
-
-                await userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
-                await userManager.AddToRoleAsync(admin, "Admin");
+        private async Task CreateUserWithRoleAsync(AppUser user, string password, string role)
+        {
+            var result = await userManager.CreateAsync(user, password);
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, role);
             }
         }
     }

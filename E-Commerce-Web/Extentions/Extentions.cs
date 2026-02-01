@@ -15,6 +15,13 @@ namespace E_Commerce_Web.Extentions
             services.AddApplicationServices(configuration);
             services.AddInfrastructureServices(configuration);
             services.ConfigureAPIBehaviorOptions();
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+                });
+            });
             return services;
         }
 
@@ -67,7 +74,7 @@ namespace E_Commerce_Web.Extentions
             app.UseGlobalErrorHandler();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowAll");
             app.UseAuthorization();
 
 

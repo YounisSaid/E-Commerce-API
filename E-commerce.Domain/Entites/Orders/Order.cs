@@ -6,13 +6,14 @@ namespace E_commerce.Domain.Entites.Orders
     {
         public Order()
         { }
-        public Order(string email, ShippingAddress shippingAddress, DeliveryMethod deliveryMethod, ICollection<OrderItem> orderItems, double subTotal)
+        public Order(string email, ShippingAddress shippingAddress, DeliveryMethod deliveryMethod, ICollection<OrderItem> orderItems, double subTotal, string? paymentIntentId)
         {
             Email = email;
             ShippingAddress = shippingAddress;
             DeliveryMethod = deliveryMethod;
             OrderItems = orderItems;
             SubTotal = subTotal;
+            PaymentIntentId = paymentIntentId;
         }
 
         public string Email { get; set; } = null!;
@@ -24,6 +25,7 @@ namespace E_commerce.Domain.Entites.Orders
         public ICollection<OrderItem> OrderItems { get; set; }
 
         public double SubTotal { get; set; }
+        public string? PaymentIntentId { get; set; }
 
         public double GetTotal() => SubTotal + DeliveryMethod.Price;
     }

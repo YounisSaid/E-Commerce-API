@@ -1,15 +1,11 @@
-﻿namespace E_commerce.Domain.Entites.Identity
+﻿namespace E_Commerce.Shared.Dtos.Auth
 {
-    public class Address
+    public class UserAddressDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Street { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
-
-        public AppUser AppUser { get; set; }
-        public string AppUserId { get; set; }
-
     }
 }

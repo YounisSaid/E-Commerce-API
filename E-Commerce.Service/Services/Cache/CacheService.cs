@@ -1,7 +1,7 @@
 ﻿using E_commerce.Domain.Contracts;
 using E_Commerce.Serviece.Abstraction;
 
-namespace E_Commerce.Service.Cache
+namespace E_Commerce.Service.Services.Cache
 {
     public class CacheService(ICacheRepository cacheRepository) : ICacheService
     {

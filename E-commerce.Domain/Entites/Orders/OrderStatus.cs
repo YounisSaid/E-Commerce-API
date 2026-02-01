@@ -4,6 +4,6 @@
     {
         Pending = 0,
         Failed = 1,
-        Received = 2
+        Delivered = 2
     }
 }

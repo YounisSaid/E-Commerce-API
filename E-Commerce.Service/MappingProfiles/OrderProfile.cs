@@ -18,6 +18,8 @@ namespace E_Commerce.Service.MappingProfiles
                 .ForMember(p => p.ProductId, o => o.MapFrom(src => src.Product.ProductId))
                 .ForMember(p => p.ProductName, o => o.MapFrom(src => src.Product.ProductName))
                 .ForMember(p => p.Quantity, o => o.MapFrom(src => src.Product.Quantity));
+
+            CreateMap<DeliveryMethod, DeliveryMethodResponseDto>();
         }
 
        

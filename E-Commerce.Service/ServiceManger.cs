@@ -2,16 +2,13 @@
 using E_commerce.Domain.Contracts;
 using E_commerce.Domain.Entites.Identity;
 using E_Commerce.Service.Abstraction;
-using E_Commerce.Service.Auth;
-
-
-//using E_Commerce.Service.Abstraction;
-using E_Commerce.Service.Baskets;
-using E_Commerce.Service.Cache;
-using E_Commerce.Service.Orders;
-using E_Commerce.Service.Services;
+using E_Commerce.Service.Services.Auth;
+using E_Commerce.Service.Services.Baskets;
+using E_Commerce.Service.Services.Cache;
+using E_Commerce.Service.Services.Orders;
+using E_Commerce.Service.Services.Payment;
+using E_Commerce.Service.Services.Products;
 using E_Commerce.Serviece.Abstraction;
-using E_Commerce.Serviece.Abstraction.Auth;
 using E_Commerce.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +21,8 @@ namespace E_Commerce.Service
                                IBasketRepository basketRepository,
                                ICacheRepository cacheRepository,
                                UserManager<AppUser> userManager,
-                               IOptions<JwtOptions> options) : IServiceManager
+                               IOptions<JwtOptions> options,
+                               IConfiguration configuration) : IServiceManager
     {
         public IProductService ProductService { get; } = new ProductService(unitOfWork, mapper);
 
@@ -32,8 +30,10 @@ namespace E_Commerce.Service
 
         public ICacheService CacheService { get; } = new CacheService(cacheRepository);
 
-        public IAuthService AuthService { get; } = new AuthService(userManager, options);
+        public IAuthService AuthService { get; } = new AuthService(userManager, options, mapper, unitOfWork);
 
-        public IOrderService OrderService { get; } = new OrderService(unitOfWork,mapper, basketRepository);
+        public IOrderService OrderService { get; } = new OrderService(unitOfWork, mapper, basketRepository);
+
+        public IPaymentService PaymentService { get; } = new PaymentService(unitOfWork, basketRepository, configuration, mapper);
     }
 }

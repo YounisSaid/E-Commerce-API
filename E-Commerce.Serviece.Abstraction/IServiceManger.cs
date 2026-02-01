@@ -1,5 +1,4 @@
 ﻿using E_Commerce.Serviece.Abstraction;
-using E_Commerce.Serviece.Abstraction.Auth;
 
 namespace E_Commerce.Service.Abstraction
 {
@@ -10,5 +9,6 @@ namespace E_Commerce.Service.Abstraction
         public ICacheService CacheService { get; }
         public IAuthService AuthService { get; }
         public IOrderService OrderService { get; }
+        public IPaymentService PaymentService { get; }
     }
 }

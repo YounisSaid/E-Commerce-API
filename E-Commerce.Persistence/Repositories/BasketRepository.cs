@@ -8,29 +8,37 @@ namespace E_Commerce.Persistence.Repositories
     public class BasketRepository(IConnectionMultiplexer connection) : IBasketRepository
     {
         private readonly IDatabase _database = connection.GetDatabase();
-        public async Task<CustomerBasket> GetBasketAsync(string Id)
-        {
-            var basketRedis = await _database.StringGetAsync(Id);
-            if(basketRedis.IsNullOrEmpty) return null;
 
-            var CustomerBasket = JsonSerializer.Deserialize<CustomerBasket>(basketRedis);
-            if (CustomerBasket is null) return null;
-
-            return  CustomerBasket;
-        }
-        public async Task<CustomerBasket> CreateBasketAsync(CustomerBasket basket, TimeSpan duration)
+        public async Task<CustomerBasket?> GetBasketAsync(string basketId)
         {
-            var serializedBasket = JsonSerializer.Serialize(basket);  
-            if(serializedBasket is null) return null;
-            var flag = await _database.StringSetAsync(basket.Id, serializedBasket, duration);
-            if(!flag) return null;
-            return await GetBasketAsync(basket.Id);
+            var data = await _database.StringGetAsync(basketId);
+
+            return data.IsNullOrEmpty
+                ? null
+                : JsonSerializer.Deserialize<CustomerBasket>(data!);
         }
 
-        public async Task<bool> DeleteBasketAsync(string Id)
+        public async Task<CustomerBasket?> CreateBasketAsync(CustomerBasket basket, TimeSpan duration)
         {
-            return  await _database.KeyDeleteAsync(Id);
+            EnsureBasketId(basket);
+
+            var serializedBasket = JsonSerializer.Serialize(basket);
+            var isCreated = await _database.StringSetAsync(basket.Id, serializedBasket, duration);
+
+            return isCreated ? basket : null;
         }
 
+        public async Task<bool> DeleteBasketAsync(string basketId)
+        {
+            return await _database.KeyDeleteAsync(basketId);
+        }
+
+        private static void EnsureBasketId(CustomerBasket basket)
+        {
+            if (string.IsNullOrEmpty(basket.Id))
+            {
+                basket.Id = Guid.NewGuid().ToString();
+            }
+        }
     }
 }
